@@ -851,7 +851,7 @@
 
   <script>
     // ─── Project Path ───
-    // When served by deploy-server.js, GET /api/project-info returns { path, name }
+    // When served by deploy-server.cjs, GET /api/project-info returns { path, name }
     // In mockup mode, show a placeholder
     (function loadProjectInfo() {
       fetch('/api/project-info')
@@ -864,7 +864,7 @@
         .catch(function() {
           // Mockup mode — no server running
           var el = document.getElementById('projectPath');
-          el.textContent = 'Deployment console — start deploy-server.js to connect';
+          el.textContent = 'Deployment console — start deploy-server.cjs to connect';
         });
     })();
 

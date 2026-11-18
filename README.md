@@ -1,6 +1,6 @@
 # @medic/cht-ai-tools
 
-AI development tools for the [Community Health Toolkit](https://communityhealthtoolkit.org/) (CHT). Installs CHT-specific skills, MCP servers, commands, and hooks into [Claude Code](https://claude.ai/code) or [OpenCode](https://opencode.ai).
+AI development tools for the [Community Health Toolkit](https://communityhealthtoolkit.org/) (CHT). Installs CHT-specific skills, MCP servers, commands, and hooks into [Claude Code](https://claude.ai/code), [OpenCode](https://opencode.ai), or [Codex](https://developers.openai.com/codex).
 
 ## Installation
 
@@ -40,14 +40,29 @@ npx @medic/cht-ai-tools install --target opencode
 
 > **Note:** Hooks are not supported in OpenCode and will be skipped automatically.
 
+### Codex
+
+Run this from a CHT project directory to install for that project. Omit `--project` for a user-wide installation.
+
+```bash
+npx @medic/cht-ai-tools install --target codex --all --project
+```
+
+To try this checkout before release, run `npm ci && npm run build` in the tools repository,
+then run `node /path/to/cht-ai-tools/dist/index.js install --target codex --all --project` from your CHT project.
+
+Restart Codex, trust the project if prompted, and review the installed hooks with `/hooks`.
+Invoke `$cht-specialist`, `$create-cht-task`, `$create-cht-target`, or `$cht-form-builder` in a prompt.
+For form creation, comparison, or deployment, describe the action after `$cht-form-builder`.
+
 ## What It Installs
 
-| Component | Claude Code | OpenCode |
-|-----------|:-----------:|:--------:|
-| **CHT Skills** (`cht-specialist`, `create-cht-task`, `create-cht-target`, `cht-form-builder`) | ✓ | ✓ |
-| **CHT Docs MCP** (documentation access) | ✓ | ✓ |
-| **Slash Commands** (`/cht-task`, `/cht-target`, `/cht-specialist`, `/create-form`, `/deploy`) | ✓ | ✓ |
-| **Hooks** (validation & formatting) | ✓ | — |
+| Component | Claude Code | OpenCode | Codex |
+|-----------|:-----------:|:--------:|:-----:|
+| CHT skills | ✓ | ✓ | ✓ |
+| CHT Docs MCP | ✓ | ✓ | ✓ |
+| Command workflows | Slash commands | Slash commands | Skills |
+| Validation and formatting hooks | ✓ | — | ✓ |
 
 ## CLI Usage
 
@@ -62,11 +77,11 @@ npx @medic/cht-ai-tools install --skills --mcp --project
 
 | Flag | Description |
 |------|-------------|
-| `--target <name>` | Target platform: `claude-code` or `opencode` (auto-detected if omitted) |
+| `--target <name>` | Target platform: `claude-code`, `opencode`, or `codex` (auto-detected if omitted) |
 | `--skills` | Install CHT skills |
 | `--mcp` | Install MCP servers |
-| `--commands` | Install slash commands |
-| `--hooks` | Install validation/formatting hooks (Claude Code only) |
+| `--commands` | Install slash commands or their corresponding Codex skills |
+| `--hooks` | Install validation/formatting hooks (Claude Code and Codex) |
 | `--all`, `-y`, `--yes` | Install all components (non-interactive) |
 | `--project` | Install to project directory instead of global config |
 
@@ -136,16 +151,27 @@ Quick access to skills:
 - `/create-form` - Generate a form from a design document or conversation
 - `/deploy` - Launch the local deployment UI
 
-### Hooks (Claude Code only)
+### Hooks
 
 Automatic validation and formatting of CHT configuration files (`tasks.js`, `targets.js`, `contact-summary.templated.js`, `purge.js`):
 
 - **validate-cht** (PreToolUse → Bash) - Syntax-checks CHT config files before commands run
-- **format-cht** (PostToolUse → Write) - Auto-formats CHT config files via ESLint after writes
+- **format-cht** (PostToolUse → Codex patches or Claude Code writes) - Auto-formats CHT config files via ESLint after writes
 
-> **Note:** Hook installation merges into your existing `settings.json`. If you have custom hooks on the same event+matcher (e.g., other `PreToolUse → Bash` hooks), they will be preserved alongside the CHT hooks.
+> **Note:** Hook installation merges into your existing Claude Code `settings.json` or Codex `hooks.json`. If you have custom hooks on the same event+matcher (e.g., other `PreToolUse → Bash` hooks), they will be preserved alongside the CHT hooks.
 
 ## Configuration Locations
+
+### Codex
+
+| Scope | Skills | MCP and hooks |
+|-------|--------|---------------|
+| User | `~/.agents/skills/` | `${CODEX_HOME:-$HOME/.codex}/config.toml` and `hooks.json` in the same directory |
+| Project | `.agents/skills/` | `.codex/config.toml` and `.codex/hooks.json` |
+
+The Codex hooks use Bash and `jq`. Formatting also uses the project's local ESLint.
+Re-run the project hook installer if you move the checkout, since the hook commands
+reference their installed scripts by absolute path.
 
 ### Claude Code
 
@@ -168,7 +194,7 @@ The plugin install method (`/plugin marketplace add` + `/plugin install`) requir
 The CLI install method (`npx`) requires:
 
 - Node.js 18+
-- Claude Code or OpenCode
+- Claude Code, OpenCode, or Codex
 
 The OpenCode manual setup (git clone + symlinks) requires only Git.
 
@@ -194,6 +220,7 @@ cht-ai-tools/
 │   │   ├── utils.ts          # Shared utilities (JSON config, path checks)
 │   │   ├── claude-code.ts    # Claude Code implementation
 │   │   ├── opencode.ts       # OpenCode implementation
+│   │   ├── codex.ts          # Codex implementation
 │   │   └── registry.ts       # Target auto-detection registry
 │   ├── installers/           # Tool-agnostic installation logic
 │   │   ├── skills.ts
@@ -235,6 +262,7 @@ Currently implemented targets:
 |--------|:------:|:---:|:--------:|:-----:|
 | Claude Code | ✓ | ✓ | ✓ | ✓ |
 | OpenCode | ✓ | ✓ | ✓ | — |
+| Codex | ✓ | ✓ | Skills | ✓ |
 
 To add support for another AI tool (e.g., Cursor, Windsurf):
 

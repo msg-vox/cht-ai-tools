@@ -6,9 +6,12 @@ import type { Target } from './base.js';
 import { ClaudeCodeTarget } from './claude-code.js';
 import { OpenCodeTarget } from './opencode.js';
 
+import { CodexTarget } from './codex.js';
+
 const ALL_TARGETS: Target[] = [
   new ClaudeCodeTarget(),
   new OpenCodeTarget(),
+  new CodexTarget(),
 ];
 
 /**

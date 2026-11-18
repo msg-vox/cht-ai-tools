@@ -1,11 +1,11 @@
 /**
- * deploy-server.js
+ * deploy-server.cjs
  *
  * Lightweight Node.js HTTP server for the CHT deployment UI.
  * Zero external dependencies — uses only Node.js built-ins.
  *
  * Usage:
- *   node deploy-server.js
+ *   node deploy-server.cjs
  *
  * The server binds to 127.0.0.1 on port 3853 (or the next available port),
  * serves the deploy UI, and exposes a small REST/SSE API for running cht-conf

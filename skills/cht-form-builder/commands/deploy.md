@@ -21,13 +21,13 @@ Launch the local deployment web UI for deploying CHT config to an instance.
 Start the deployment server:
 
 ```bash
-node ${CLAUDE_PLUGIN_ROOT}/scripts/deploy-server.js
+node ${CLAUDE_PLUGIN_ROOT}/scripts/deploy-server.cjs
 ```
 
 If launching after form creation, pass the form name to pre-select it:
 
 ```bash
-node ${CLAUDE_PLUGIN_ROOT}/scripts/deploy-server.js --form=patient_assessment_under_5
+node ${CLAUDE_PLUGIN_ROOT}/scripts/deploy-server.cjs --form=patient_assessment_under_5
 ```
 
 The server will:
@@ -41,7 +41,7 @@ Tell the user to open the printed URL in their browser. Credentials are entered 
 
 ## Note
 
-The `deploy-server.js` script is implemented in Phase 7. If not yet available, inform the user and suggest running cht-conf commands manually:
+The `deploy-server.cjs` script is implemented in Phase 7. If not yet available, inform the user and suggest running cht-conf commands manually:
 
 ```bash
 cht --url=https://user:pass@instance --accept-self-signed-certs compile-app-settings upload-app-settings convert-app-forms upload-app-forms upload-resources upload-custom-translations

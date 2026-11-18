@@ -297,3 +297,5 @@ The CHT provides an official MCP (Model Context Protocol) server for AI-assisted
 claude mcp add --transport http cht-kapa-docs https://mcp-docs.dev.medicmobile.org/mcp
 ```
 
+
+For Codex, install this server with `npx @medic/cht-ai-tools install --target codex --mcp`.

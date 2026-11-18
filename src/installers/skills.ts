@@ -2,6 +2,7 @@ import type { Target, Skill, InstallOptions } from '../targets/base.js';
 import { getAssetPath } from './common.js';
 
 export const CHT_SKILLS: Skill[] = [
+  { name: 'cht-form-builder', sourcePath: getAssetPath('skills/cht-form-builder') },
   { name: 'cht-specialist', sourcePath: getAssetPath('skills/cht-specialist') },
   { name: 'create-cht-task', sourcePath: getAssetPath('skills/create-cht-task') },
   { name: 'create-cht-target', sourcePath: getAssetPath('skills/create-cht-target') },

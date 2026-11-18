@@ -1,7 +1,7 @@
 {
   "name": "@medic/cht-ai-tools",
   "version": "0.1.0",
-  "description": "AI development tools for Community Health Toolkit - installs CHT-specific skills, MCP servers, and tools into Claude Code or OpenCode",
+  "description": "AI development tools for Community Health Toolkit - installs CHT-specific skills, MCP servers, and tools into Claude Code, OpenCode, or Codex",
   "type": "module",
   "bin": {
     "cht-ai-tools": "./dist/index.js"
@@ -45,7 +45,8 @@
   },
   "dependencies": {
     "@clack/prompts": "^0.9.1",
-    "picocolors": "^1.1.1"
+    "picocolors": "^1.1.1",
+    "smol-toml": "^1.9.1"
   },
   "devDependencies": {
     "@commitlint/cli": "^20.4.1",

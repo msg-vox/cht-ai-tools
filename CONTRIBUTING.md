@@ -179,11 +179,12 @@ npm run build
 node dist/index.js install
 # Claude Code: check ~/.claude/mcp_config.json
 # OpenCode: check ~/.config/opencode/opencode.json
+# Codex: check ~/.codex/config.toml (or $CODEX_HOME/config.toml)
 ```
 
 ### Adding a New Hook
 
-Hooks are Claude Code only. OpenCode does not support hooks.
+Hooks are available in Claude Code and Codex. Codex uses `hooks.json` and requires review in `/hooks`.
 
 1. **Create the hook script** in `hooks/scripts/` at the package root:
 

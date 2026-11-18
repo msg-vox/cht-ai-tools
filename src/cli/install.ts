@@ -22,6 +22,7 @@ import {
 const TARGET_DISPLAY_NAMES: Record<string, string> = {
   'claude-code': 'Claude Code',
   'opencode': 'OpenCode',
+  'codex': 'Codex',
 };
 
 function getTargetDisplayName(target: Target): string {
@@ -29,6 +30,9 @@ function getTargetDisplayName(target: Target): string {
 }
 
 function getDisplayPath(target: Target, location: InstallLocation): string {
+  if (target.name === 'codex') {
+    return location === 'global' ? '~/.agents/skills and ' + target.getConfigPath(location) : './.agents/skills and ./.codex';
+  }
   if (target.name === 'opencode') {
     return location === 'global' ? '~/.config/opencode/' : './.opencode/';
   }
@@ -38,11 +42,11 @@ function getDisplayPath(target: Target, location: InstallLocation): string {
 /**
  * Format selection for display
  */
-function formatSelection(selection: SelectionResult): string {
+function formatSelection(selection: SelectionResult, target: Target): string {
   const parts: string[] = [];
   if (selection.skills.length) parts.push(...selection.skills);
   if (selection.mcp.length) parts.push(...selection.mcp);
-  if (selection.commands.length) parts.push(...selection.commands.map(c => `/${c}`));
+  if (selection.commands.length) parts.push(...selection.commands.map(c => target.name === 'codex' ? c : `/${c}`));
   if (selection.hooks.length) parts.push(...selection.hooks);
   return parts.map(s => pc.cyan(s)).join(', ');
 }
@@ -58,8 +62,7 @@ async function installSelectedItems(
   const spinner = p.spinner();
   spinner.start('Installing components...');
 
-  const basePath = target.getConfigPath(location);
-  await ensureDir(basePath);
+  if (target.name !== 'codex') await ensureDir(target.getConfigPath(location));
 
   const results: string[] = [];
 
@@ -76,7 +79,9 @@ async function installSelectedItems(
 
     if (selection.commands.length) {
       await installCommands(target, location, selection.commands, { overwrite: true });
-      results.push(`${pc.green('✓')} Commands: ${selection.commands.map(c => `/${c}`).join(', ')}`);
+      results.push(target.name === 'codex'
+        ? `${pc.green('✓')} Installed the skills for the selected command workflows`
+        : `${pc.green('✓')} Commands: ${selection.commands.map(c => `/${c}`).join(', ')}`);
     }
 
     if (selection.hooks.length) {
@@ -187,6 +192,11 @@ export async function runInstall(options: InstallOptions = {}): Promise<void> {
       selection = allItems();
     }
 
+    if (target.name === 'codex' && selection.skills.length) {
+      // The full skill selection already includes the command workflows.
+      selection.commands = [];
+    }
+
     // Filter out hooks if target doesn't support them
     if (!supportsHooks && selection.hooks.length > 0) {
       p.log.warn(`${displayName} does not support hooks. Skipping hook installation.`);
@@ -194,7 +204,7 @@ export async function runInstall(options: InstallOptions = {}): Promise<void> {
     }
 
     const displayPath = getDisplayPath(target, location);
-    p.log.step(`Installing ${formatSelection(selection)} to ${pc.cyan(displayPath)}`);
+    p.log.step(`Installing ${formatSelection(selection, target)} to ${pc.cyan(displayPath)}`);
   } else {
     // Interactive mode (no flags passed)
     location = await promptInstallLocation(target);
@@ -217,11 +227,15 @@ export async function runInstall(options: InstallOptions = {}): Promise<void> {
       process.exit(0);
     }
 
-    p.log.step(`Selected: ${formatSelection(selection)}`);
+    p.log.step(`Selected: ${formatSelection(selection, target)}`);
   }
 
   // Install items
   await installSelectedItems(target, selection, location);
+
+  if (target.name === 'codex' && selection.hooks.length) {
+    p.log.info('Review and trust the CHT hooks with /hooks in Codex.');
+  }
 
   // Show success message
   p.outro(

@@ -30,10 +30,12 @@ describe('getTargetByName', () => {
 });
 
 describe('allTargetNames', () => {
-  it('returns both target names', () => {
+  it('returns all target names', () => {
     const names = allTargetNames();
     expect(names).toContain('claude-code');
     expect(names).toContain('opencode');
-    expect(names).toHaveLength(2);
+    expect(names).toContain('codex');
+    expect(getTargetByName('codex')?.name).toBe('codex');
+    expect(names).toHaveLength(3);
   });
 });

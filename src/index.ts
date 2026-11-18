@@ -35,20 +35,20 @@ const command = args.find((a, i) => {
 
 if (args.includes('--help') || args.includes('-h') || !command) {
   console.log(`
-  CHT AI Tools - Install CHT tools into Claude Code or OpenCode
+  CHT AI Tools - Install CHT tools into Claude Code, OpenCode, or Codex
 
   Usage:
     npx @medic/cht-ai-tools install [options]
 
   Commands:
-    install         Install CHT tools into Claude Code or OpenCode
+    install         Install CHT tools into Claude Code, OpenCode, or Codex
 
   Options:
-    --target <name>  Target platform: claude-code, opencode (auto-detected if omitted)
+    --target <name>  Target platform: claude-code, opencode, codex (auto-detected if omitted)
     --skills      Install skills only
     --mcp         Install MCP servers only
-    --commands    Install slash commands only
-    --hooks       Install hooks only (Claude Code only)
+    --commands    Install commands or corresponding Codex skills
+    --hooks       Install hooks only (Claude Code and Codex)
     --all, --yes, -y  Install all components (non-interactive)
     --project     Install to project directory instead of global config
     --help, -h    Show this help message
@@ -57,7 +57,7 @@ if (args.includes('--help') || args.includes('-h') || !command) {
   Examples:
     npx @medic/cht-ai-tools install              # Interactive mode (auto-detect target)
     npx @medic/cht-ai-tools install --all        # Install everything
-    npx @medic/cht-ai-tools install --target opencode --all
+    npx @medic/cht-ai-tools install --target codex --all
     npx @medic/cht-ai-tools install --skills --mcp --project
 `);
   process.exit(0);

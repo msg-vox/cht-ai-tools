@@ -123,7 +123,7 @@ skills/cht-form-builder/
 │   ├── parse-design-sheet.py         # Excel design parser
 │   ├── generate-xlsform.py           # XLSForm file generator
 │   ├── parse-xlsform.py              # XLSForm reader (for compare mode)
-│   ├── deploy-server.js              # Local deployment web server
+│   ├── deploy-server.cjs              # Local deployment web server
 │   └── detect-project-languages.sh   # Language detection helper
 ├── references/
 │   ├── cht-forms.md                  # CHT app form structure

@@ -54,6 +54,7 @@ export async function promptTargetSelection(targets: Target[]): Promise<Target> 
   const DISPLAY_NAMES: Record<string, string> = {
     'claude-code': 'Claude Code',
     'opencode': 'OpenCode',
+    'codex': 'Codex',
   };
 
   const result = await p.select({
@@ -76,13 +77,12 @@ export async function promptTargetSelection(targets: Target[]): Promise<Target> 
  * Prompt user to select installation location
  */
 export async function promptInstallLocation(target: Target): Promise<InstallLocation> {
-  const isOpenCode = target.name === 'opencode';
-  const globalHint = isOpenCode
-    ? 'Install to ~/.config/opencode/ for all projects'
-    : 'Install to ~/.claude/ for all projects';
-  const projectHint = isOpenCode
-    ? 'Install to ./.opencode/ for this project only'
-    : 'Install to ./.claude/ for this project only';
+  const globalHint = target.name === 'codex'
+    ? `~/.agents/skills and ${target.getConfigPath('global')}`
+    : target.getConfigPath('global');
+  const projectHint = target.name === 'codex'
+    ? './.agents/skills and ./.codex'
+    : target.getConfigPath('project');
 
   const location = await p.select({
     message: 'Where would you like to install CHT tools?',
@@ -144,7 +144,7 @@ export async function promptItems(target: Target): Promise<SelectionResult> {
   const groups: Record<string, Array<{ value: string; label: string; hint?: string }>> = {
     'Skills': skillOptions,
     'MCP Servers': mcpOptions,
-    'Slash Commands': commandOptions,
+    ...(target.name === 'codex' ? {} : { 'Slash Commands': commandOptions }),
   };
 
   if (supportsHooks) {

@@ -9,34 +9,26 @@ if [[ ! -f "package.json" ]] || ! grep -q "cht-conf" package.json 2>/dev/null; t
   exit 0
 fi
 
-# Read the file path that was just written from stdin JSON
+if ! command -v npx &>/dev/null || [[ ! -f "node_modules/.bin/eslint" ]]; then
+  exit 0
+fi
+
 INPUT=$(cat)
-FILE_PATH=$(echo "$INPUT" | jq -r '.tool_input.file_path // empty' 2>/dev/null)
-
-if [[ -z "$FILE_PATH" ]]; then
-  exit 0
-fi
-
-# Resolve to basename for comparison
-FILE_NAME=$(basename "$FILE_PATH")
-
-# Only format known CHT config files
-CHT_FILES=(tasks.js targets.js contact-summary.templated.js purge.js)
-IS_CHT_FILE=false
-for cht_file in "${CHT_FILES[@]}"; do
-  if [[ "$FILE_NAME" == "$cht_file" ]]; then
-    IS_CHT_FILE=true
-    break
+{
+  jq -r '.tool_input.file_path // empty' <<< "$INPUT"
+  if [[ "${1:-}" == "--codex" ]]; then
+    # Codex patch calls carry file names in the patch header.
+    jq -r '.tool_input.command // empty' <<< "$INPUT" |
+      sed -nE 's/^\*\*\* (Add File|Update File|Move to): (.+)$/\2/p'
   fi
+} 2>/dev/null | sort -u | while IFS= read -r FILE_PATH; do
+  case "${FILE_PATH##*/}" in
+    tasks.js|targets.js|contact-summary.templated.js|purge.js)
+      if [[ -f "$FILE_PATH" ]]; then
+        npx eslint --fix -- "$FILE_PATH" >/dev/null 2>&1
+      fi
+      ;;
+  esac
 done
-
-if [[ "$IS_CHT_FILE" != true ]]; then
-  exit 0
-fi
-
-# Use ESLint --fix if available
-if command -v npx &> /dev/null && [[ -f "node_modules/.bin/eslint" ]]; then
-  npx eslint --fix "$FILE_PATH" 2>/dev/null
-fi
 
 exit 0
